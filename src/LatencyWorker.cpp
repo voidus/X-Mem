@@ -36,6 +36,7 @@
 
 //Libraries
 #include <iostream>
+#include <fstream>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -66,6 +67,14 @@ LatencyWorker::LatencyWorker(
 }
 
 LatencyWorker::~LatencyWorker() {
+}
+
+static inline
+uint64_t rdtsc()
+{
+   uint32_t hi, lo;
+   __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+   return ( (uint64_t)lo)|( ((uint64_t)hi)<<32 );
 }
 
 void LatencyWorker::run() {
@@ -121,6 +130,12 @@ void LatencyWorker::run() {
         forwSequentialRead_Word32(prime_start_address, prime_end_address); //dependent reads on the memory, make sure caches are ready, coherence, etc...
     }
 
+    std::ofstream flushfile;
+    flushfile.open("/sys/kernel/debug/pebs_extract/flush");
+    flushfile << "1";
+    flushfile.close();
+    std::cout << "Starting Benchmark at " << rdtsc() << "\n";
+
     //Run benchmark
     //Run actual version of function and loop overhead
     next_address = static_cast<uintptr_t*>(mem_array); 
@@ -131,6 +146,11 @@ void LatencyWorker::run() {
         elapsed_ticks += (stop_tick - start_tick);
         passes+=256;
     }
+
+    flushfile.open("/sys/kernel/debug/pebs_extract/flush");
+    flushfile << "1";
+    flushfile.close();
+    std::cout << "Finished Benchmark at " << rdtsc() << "\n";
 
     //Run dummy version of function and loop overhead
     next_address = static_cast<uintptr_t*>(mem_array); 
