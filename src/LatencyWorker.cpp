@@ -130,6 +130,7 @@ void LatencyWorker::run() {
         forwSequentialRead_Word32(prime_start_address, prime_end_address); //dependent reads on the memory, make sure caches are ready, coherence, etc...
     }
 
+    std::cout << "Preflush " << rdtsc() << "\n";
     std::ofstream flushfile;
     flushfile.open("/sys/kernel/debug/pebs_extract/flush");
     flushfile << "0";
@@ -147,6 +148,7 @@ void LatencyWorker::run() {
         passes+=256;
     }
 
+    std::cout << "Preflush " << rdtsc() << "\n";
     flushfile.open("/sys/kernel/debug/pebs_extract/flush");
     flushfile << "0";
     flushfile.close();
