@@ -132,7 +132,7 @@ void LatencyWorker::run() {
 
     std::ofstream flushfile;
     flushfile.open("/sys/kernel/debug/pebs_extract/flush");
-    flushfile << "1";
+    flushfile << "0";
     flushfile.close();
     std::cout << "Starting Benchmark at " << rdtsc() << "\n";
 
@@ -148,7 +148,7 @@ void LatencyWorker::run() {
     }
 
     flushfile.open("/sys/kernel/debug/pebs_extract/flush");
-    flushfile << "1";
+    flushfile << "0";
     flushfile.close();
     std::cout << "Finished Benchmark at " << rdtsc() << "\n";
 
